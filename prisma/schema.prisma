@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @unique @default(uuid())
+  CreatedAt DateTime @default(now())
+  UpdatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  name                     String  @unique
+  email                    String  @unique
+  hash                     String
+  NumberOfPiligrimsAllowed Int?
+  status                   Boolean @default(true)
+
+  role Role @default(USER)
+
+  groups Group[]
+}
+
+model Pilgrim {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  numPassport String  @unique
+  name        String
+  lastName    String
+  gender      String
+  dateOfBirth String
+  tel         String
+  isChef      Boolean @default(false)
+  groupId     String?
+  group       Group?  @relation(fields: [groupId], references: [id])
+  chef        Chef[]
+}
+
+model Group {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  name        String
+  capacity    Int
+  description String?
+
+  userId   String
+  user     User      @relation(fields: [userId], references: [id])
+  pilgrims Pilgrim[]
+  chefId   String
+  chef     Chef      @relation(fields: [chefId], references: [id])
+}
+
+model Chef {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+  pilgrimid String
+  pirlgrim  Pilgrim  @relation(fields: [pilgrimid], references: [id])
+  groups    Group[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
