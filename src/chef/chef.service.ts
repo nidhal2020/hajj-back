@@ -3,6 +3,7 @@ import { Group } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PilgromReqDto } from 'src/pilgrim/dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ListeOfChef } from './dto';
 
 @Injectable()
 export class ChefService {
@@ -41,5 +42,34 @@ export class ChefService {
           }
           throw error;
         }
+    }
+
+    async getListOfChef():Promise<ListeOfChef[]>{
+        const chefs = await this.prisma.pilgrim.findMany({where:{
+            isChef:true
+        }})
+
+        const chef = chefs.map((chef)=>({
+            id:chef.id,
+            name:chef.name,
+            lastName:chef.lastName
+        }))
+
+        return chef
+    }
+
+    async getListOfChefByCountry(userdata:any){
+        const userId = userdata.user.id
+        
+        const chefs = await this.prisma.pilgrim.findMany({
+            where:{
+                isChef:true,
+                group:
+            },
+            include:{
+                group:true
+            }
+        })
+        
     }
 }
