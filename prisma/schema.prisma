@@ -30,16 +30,63 @@ model Pilgrim {
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
 
-  numPassport String  @unique
+  numPassport String                 @unique
   name        String
   lastName    String
   gender      String
   dateOfBirth String
   tel         String
-  isChef      Boolean @default(false)
+  isChef      Boolean                @default(false)
   groupId     String?
-  group       Group?  @relation(fields: [groupId], references: [id])
+  group       Group?                 @relation(fields: [groupId], references: [id])
   chef        Chef[]
+  diseases    Pilgrim_Has_Diseases[]
+  vaccins     Pilgrim_Has_Vaccins[]
+}
+
+model Disease {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  diseaseName String
+  pilgrims    Pilgrim_Has_Diseases[]
+}
+
+model Vaccin {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  vaccinName String
+  pilgrims   Pilgrim_Has_Vaccins[]
+}
+
+model Pilgrim_Has_Diseases {
+  assignedAt DateTime @default(now())
+  assignedBy String
+
+  pilgrimId String
+  pilgrim   Pilgrim @relation(fields: [pilgrimId], references: [id])
+
+  diseaseId String
+  disease   Disease @relation(fields: [diseaseId], references: [id])
+
+  @@id([pilgrimId, diseaseId])
+}
+
+model Pilgrim_Has_Vaccins {
+  assignedAt DateTime @default(now())
+  assignedBy String
+  pilgrimId  String
+  pilgrim    Pilgrim  @relation(fields: [pilgrimId], references: [id])
+
+  vaccinId String
+  vaccin   Vaccin @relation(fields: [vaccinId], references: [id])
+
+  @@id([pilgrimId, vaccinId])
 }
 
 model Group {
