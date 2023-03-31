@@ -13,6 +13,10 @@ import { LoggerMiddleware } from './auth/middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { GroupModule } from './group/group.module';
 import { ChefModule } from './chef/chef.module';
+import { VaccinsModule } from './vaccins/vaccins.module';
+import { DiseaseModule } from './disease/disease.module';
+import { PilgrimHasDiseasesModule } from './pilgrim_has_diseases/pilgrim_has_diseases.module';
+import { PilgrimHasVaccinsModule } from './pilgrim_has_vaccins/pilgrim_has_vaccins.module';
 
 @Module({
   imports: [
@@ -24,6 +28,10 @@ import { ChefModule } from './chef/chef.module';
     ConfigModule.forRoot({ isGlobal: true }),
     GroupModule,
     ChefModule,
+    VaccinsModule,
+    DiseaseModule,
+    PilgrimHasDiseasesModule,
+    PilgrimHasVaccinsModule,
   ],
 })
 export class AppModule implements NestModule {

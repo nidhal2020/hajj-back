@@ -42,6 +42,18 @@ model Pilgrim {
   chef        Chef[]
   diseases    Pilgrim_Has_Diseases[]
   vaccins     Pilgrim_Has_Vaccins[]
+  emergencyContact EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
+  emergencyContactId String?
+}
+model EmergencyContact {
+  id            String      @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  firstName     String
+  lastName      String
+  phone         String
+  email         String?
+  pilgrims      Pilgrim[]   
 }
 
 model Disease {
