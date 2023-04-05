@@ -17,6 +17,7 @@ import { VaccinsModule } from './vaccins/vaccins.module';
 import { DiseaseModule } from './disease/disease.module';
 import { PilgrimHasDiseasesModule } from './pilgrim_has_diseases/pilgrim_has_diseases.module';
 import { PilgrimHasVaccinsModule } from './pilgrim_has_vaccins/pilgrim_has_vaccins.module';
+import { EmergencyContactModule } from './emergency-contact/emergency-contact.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { PilgrimHasVaccinsModule } from './pilgrim_has_vaccins/pilgrim_has_vacci
     DiseaseModule,
     PilgrimHasDiseasesModule,
     PilgrimHasVaccinsModule,
+    EmergencyContactModule,
   ],
 })
 export class AppModule implements NestModule {
