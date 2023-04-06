@@ -19,6 +19,7 @@ import { PilgrimHasDiseasesModule } from './pilgrim_has_diseases/pilgrim_has_dis
 import { PilgrimHasVaccinsModule } from './pilgrim_has_vaccins/pilgrim_has_vaccins.module';
 import { EmergencyContactModule } from './emergency-contact/emergency-contact.module';
 import { HotelModule } from './hotel/hotel.module';
+import { AgentModule } from './agent/agent.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { HotelModule } from './hotel/hotel.module';
     PilgrimHasVaccinsModule,
     EmergencyContactModule,
     HotelModule,
+    AgentModule,
   ],
 })
 export class AppModule implements NestModule {
@@ -50,6 +52,7 @@ export class AppModule implements NestModule {
         { path: 'hotel/getHotel', method: RequestMethod.GET },
         { path: 'hotel/updateHotel', method: RequestMethod.PUT },
         { path: 'hotel/remove', method: RequestMethod.DELETE },
+        { path: 'agent', method: RequestMethod.ALL },
       );
   }
 }

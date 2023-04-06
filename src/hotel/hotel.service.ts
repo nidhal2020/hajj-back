@@ -29,6 +29,7 @@ export class HotelService {
       const page = parseInt(takeNumber);
       const skip = page * pageSize;
       const totalCount = await this.prisma.hotel.count();
+      const totalPages = Math.ceil(totalCount / pageSize);
       const hotels = await this.prisma.hotel.findMany({
         skip: skip,
         take: pageSize,
@@ -39,7 +40,7 @@ export class HotelService {
           isDeleted: false,
         },
       });
-      return { hotels: hotels, totalPages: totalCount, page: page };
+      return { hotels: hotels, totalPages: totalPages, page: page };
     } catch (error) {
       throw new Error(`Could not find hotels: ${error.message}`);
     }
