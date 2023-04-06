@@ -18,6 +18,7 @@ import { DiseaseModule } from './disease/disease.module';
 import { PilgrimHasDiseasesModule } from './pilgrim_has_diseases/pilgrim_has_diseases.module';
 import { PilgrimHasVaccinsModule } from './pilgrim_has_vaccins/pilgrim_has_vaccins.module';
 import { EmergencyContactModule } from './emergency-contact/emergency-contact.module';
+import { HotelModule } from './hotel/hotel.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { EmergencyContactModule } from './emergency-contact/emergency-contact.mo
     PilgrimHasDiseasesModule,
     PilgrimHasVaccinsModule,
     EmergencyContactModule,
+    HotelModule,
   ],
 })
 export class AppModule implements NestModule {
@@ -44,6 +46,10 @@ export class AppModule implements NestModule {
         { path: 'auth/registre', method: RequestMethod.POST },
         { path: 'users/allUsers', method: RequestMethod.GET },
         { path: 'pilgrim/allPilgrims', method: RequestMethod.GET },
+        { path: 'hotel/createHotel', method: RequestMethod.POST },
+        { path: 'hotel/getHotel', method: RequestMethod.GET },
+        { path: 'hotel/updateHotel', method: RequestMethod.PUT },
+        { path: 'hotel/remove', method: RequestMethod.DELETE },
       );
   }
 }

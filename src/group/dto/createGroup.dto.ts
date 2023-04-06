@@ -17,5 +17,9 @@ export class CreateGroupDto {
     @IsString()
     userId:String
 
+    @IsString()
     chefId:string
+
+    @IsString()
+    hotelId:string
 }

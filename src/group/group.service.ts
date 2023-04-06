@@ -61,6 +61,11 @@ export class GroupService {
               id: createDto.chefId,
             },
           },
+          hotel:{
+            connect:{
+              id:createDto.hotelId
+            }
+          }
         },
       });
       return group;

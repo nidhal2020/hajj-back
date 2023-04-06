@@ -30,30 +30,31 @@ model Pilgrim {
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
 
-  numPassport String                 @unique
-  name        String
-  lastName    String
-  gender      String
-  dateOfBirth String
-  tel         String
-  isChef      Boolean                @default(false)
-  groupId     String?
-  group       Group?                 @relation(fields: [groupId], references: [id])
-  chef        Chef[]
-  diseases    Pilgrim_Has_Diseases[]
-  vaccins     Pilgrim_Has_Vaccins[]
-  emergencyContact EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
+  numPassport        String                 @unique
+  name               String
+  lastName           String
+  gender             String
+  dateOfBirth        String
+  tel                String
+  isChef             Boolean                @default(false)
+  groupId            String?
+  group              Group?                 @relation(fields: [groupId], references: [id])
+  chef               Chef[]
+  diseases           Pilgrim_Has_Diseases[]
+  vaccins            Pilgrim_Has_Vaccins[]
+  emergencyContact   EmergencyContact?      @relation(fields: [emergencyContactId], references: [id])
   emergencyContactId String?
 }
+
 model EmergencyContact {
-  id            String      @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  firstName     String
-  lastName      String
-  phone         String
-  email         String?
-  pilgrims      Pilgrim[]   
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  firstName String
+  lastName  String
+  phone     String
+  email     String?
+  pilgrims  Pilgrim[]
 }
 
 model Disease {
@@ -110,12 +111,28 @@ model Group {
   name        String
   capacity    Int
   description String?
+  
 
   userId   String
   user     User      @relation(fields: [userId], references: [id])
   pilgrims Pilgrim[]
   chefId   String
   chef     Chef      @relation(fields: [chefId], references: [id])
+  hotelid String
+  hotel Hotel @relation(fields: [hotelid],references: [id])
+}
+
+model Hotel {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
+  name        String
+  address     String
+  phoneNumber String
+  stars       Int
+  capacity    Int
+  groups Group[]
 }
 
 model Chef {

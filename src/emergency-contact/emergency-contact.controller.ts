@@ -9,11 +9,14 @@ import {
   Patch,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { EmergencyContactService } from './emergency-contact.service';
 import { CreateEmergencyContactDto, UpdateEmergencyContactDto } from './dto';
 import { EmergencyContact } from '@prisma/client';
+import { JwtGuard } from 'src/auth/guard';
 
+@UseGuards(JwtGuard)
 @Controller('emergency-contact')
 export class EmergencyContactController {
   constructor(
@@ -52,7 +55,7 @@ export class EmergencyContactController {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  @Patch(':id')
+  @Put(':id')
   async updateEmergencyContact(
     @Param('id') id: string,
     @Body() updateEmergencyContactDto: UpdateEmergencyContactDto,
