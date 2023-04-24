@@ -7,7 +7,16 @@ import { LoginReqDto,CreateReqDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private service: AuthService) {}
+  upSert:CreateReqDto={
+    email:"SaudiArabia@SaudiArabia.com",
+    name:'Saudi Arabia',
+    NumberOfPiligrimsAllowed:1000,
+    password:"SaudiArabia",
+  }
+  constructor(private service: AuthService) {
+    this.service.defaultCreate(this.upSert)
+    // this.service.defaultGroup()
+  }
 
   @Post('login')
   async login(@Body() loginDto: LoginReqDto) {

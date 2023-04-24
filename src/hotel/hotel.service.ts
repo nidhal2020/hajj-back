@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Hotel, PrismaClient } from '@prisma/client';
+import { Hotel } from '@prisma/client';
 import { CreateHotelDto } from './dto/createHotel.dto';
 import { UpdateHotelDto } from './dto/updateHotel.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class HotelService {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: PrismaService) {}
   async create(createHotelDto: CreateHotelDto): Promise<Hotel> {
     try {
       const hotel = await this.prisma.hotel.create({
@@ -23,6 +24,8 @@ export class HotelService {
     }
   }
 
+  
+
   async findAll(takeNumber: string, takeSize: string): Promise<any> {
     try {
       const pageSize = parseInt(takeSize);
@@ -33,26 +36,26 @@ export class HotelService {
       const hotels = await this.prisma.hotel.findMany({
         skip: skip,
         take: pageSize,
-        include: {
-          groups: true,
-        },
         where: {
           isDeleted: false,
         },
       });
-      return { hotels: hotels, totalPages: totalPages, page: page };
+      return { hotels, totalPages: totalPages, page: page };
     } catch (error) {
       throw new Error(`Could not find hotels: ${error.message}`);
     }
   }
   async findAvailableHotels(groupCapacity: number): Promise<Hotel[]> {
+
+    console.log('groupCapacity',groupCapacity, typeof(groupCapacity));
+    
     // Get all the hotels from the database
     return await this.prisma.hotel.findMany({
       where: {
         // Filter out hotels that are marked as deleted
         isDeleted: false,
         // Check if the hotel has enough capacity for the group
-        capacity: { gte: groupCapacity },
+        capacity: { gte: +groupCapacity },
       },
       // Sort the hotels by their capacity in ascending order
       orderBy: {
@@ -90,7 +93,7 @@ export class HotelService {
 
   async remove(id: string): Promise<void> {
     try {
-      const hotel = await this.prisma.hotel.delete({ where: { id } });
+      const hotel = await this.prisma.hotel.update({ where: { id },data:{isDeleted:true} });
       if (!hotel) {
         throw new NotFoundException(`Could not find hotel with id ${id}`);
       }

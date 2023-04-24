@@ -15,29 +15,30 @@ export class GroupService {
   constructor(private prisma: PrismaService) {}
 
   async createGroup(createDto: CreateGroupDto, userData: any) {
+    console.log(userData);
+    
     const whereId: Prisma.UserWhereUniqueInput = {
-      id: userData.user.id,
+      id: userData.id,
     };
 
-    try {
       const user = await this.prisma.user.findUnique({ where: whereId });
 
       if (!user) {
         throw new NotFoundException(`User with id ${userData.id} not found`);
       }
 
-      if (!createDto.userId) {
-        createDto.userId = user.id;
+      if (!userData.id) {
+        userData.id = user.id;
       }
-      if (user.id != createDto.userId) {
+      if (user.id != userData.id) {
         throw new NotAcceptableException(
-          `User with id ${createDto.userId} not the same user connected`,
+          `User with id ${userData.id} not the same user connected`,
         );
       }
       const existingGroup = await this.prisma.group.findFirst({
         where: {
           name: createDto.name,
-          userId: createDto.userId as string,
+          userId: userData.id as string,
         },
       });
       if (existingGroup) {
@@ -45,7 +46,7 @@ export class GroupService {
           `Group with name '${createDto.name}' already exists for user`,
         );
       }
-
+                        
       const group = await this.prisma.group.create({
         data: {
           name: createDto.name,
@@ -53,12 +54,7 @@ export class GroupService {
           description: createDto.description,
           user: {
             connect: {
-              id: createDto.userId as string,
-            },
-          },
-          chef: {
-            connect: {
-              id: createDto.chefId,
+              id: userData.id as string,
             },
           },
           hotel:{
@@ -68,47 +64,58 @@ export class GroupService {
           }
         },
       });
-      return group;
-    } catch (error) {
-      return {
-        error: error,
-      };
-    }
+      const hotel = await this.prisma.hotel.findUnique({
+        where:{
+          id:createDto.hotelId
+        }
+      })
+
+      const newHotelCapacity = hotel.capacity - createDto.capacity
+  
+      
+
+      await this.prisma.hotel.update({
+        where:{
+          id:createDto.hotelId
+        },data:{
+          capacity: newHotelCapacity
+        }
+      })
+      
+      return {group : group};
+    
   }
 
   async getGroupsByCountry(
     userData: any,
-    takeNumber: string,
-    takeSize: string,
-  ): Promise<GetGroupsDto> {
-    try {
-      const pageSize = parseInt(takeSize);
-      const page = parseInt(takeNumber);
-      const skip = page * pageSize;
-      const totalCount = await this.prisma.group.count({
-        where: { userId: userData.user.id },
-      });
+  ): Promise<any> {
+    
+      // const pageSize = parseInt(takeSize);
+      // const page = parseInt(takeNumber);
+      // const skip = page * pageSize;
+      // const totalCount = await this.prisma.group.count({
+      //   where: { userId: userData.user.id },
+      // });
 
-      console.log({
-        pageSize,
-        page,
-        skip,
-        totalCount,
-      });
+      // console.log({
+      //   pageSize,
+      //   page,
+      //   skip,
+      //   totalCount,
+      // });
 
-      const totalPages = Math.ceil(totalCount / pageSize);
+      // const totalPages = Math.ceil(totalCount / pageSize);
       const user = await this.prisma.user.findUnique({
-        where: { id: userData.user.id },
+        where: { id: userData.id },
       });
       if (!user) {
         throw new NotFoundException(`User with id ${userData.id} not found`);
       }
 
       const groups = await this.prisma.group.findMany({
-        skip: skip,
-        take: pageSize,
+
         where: {
-          userId: userData.user.id,
+          userId: userData.id,
           isDeleted:false
         },
         include: {
@@ -117,19 +124,13 @@ export class GroupService {
           chef: true,
         },
       });
-      const groupList = await this.groupInfo(groups);
+      //const groupList = await this.groupInfo(groups);
  
-        console.log(groupList);
+        //console.log(groups);
    
 
-      return {
-        groups: groupList,
-        totalPages: totalPages,
-        page: page,
-      };
-    } catch (error) {
-      return error;
-    }
+      return groups
+    
   }
   async getAllGroups(takeNumber: string, takeSize: string): Promise<any> {
     try {

@@ -13,11 +13,12 @@ model User {
   UpdatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
 
-  name                     String  @unique
-  email                    String  @unique
-  hash                     String
-  NumberOfPiligrimsAllowed Int?
-  status                   Boolean @default(true)
+  name                            String  @unique
+  email                           String  @unique
+  hash                            String
+  NumberOfPiligrimsAllowed        Int?
+  currentNumberOfArrivingPilgrims Int     @default(0)
+  status                          Boolean @default(true)
 
   role Role @default(USER)
 
@@ -63,7 +64,7 @@ model Disease {
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
 
-  diseaseName String
+  diseaseName String                 @unique
   pilgrims    Pilgrim_Has_Diseases[]
 }
 
@@ -73,7 +74,7 @@ model Vaccin {
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
 
-  vaccinName String
+  vaccinName String                @unique
   pilgrims   Pilgrim_Has_Vaccins[]
 }
 
@@ -115,8 +116,8 @@ model Group {
   userId   String
   user     User      @relation(fields: [userId], references: [id])
   pilgrims Pilgrim[]
-  chefId   String
-  chef     Chef      @relation(fields: [chefId], references: [id])
+  chefId   String?
+  chef     Chef?     @relation(fields: [chefId], references: [id])
   hotelid  String
   hotel    Hotel     @relation(fields: [hotelid], references: [id])
 }

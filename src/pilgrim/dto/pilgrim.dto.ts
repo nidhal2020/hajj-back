@@ -33,4 +33,7 @@ export class PilgromReqDto{
     @IsNotEmpty()
     @IsString()
     groupId:string
+
+    diseaseIds:string[]
+    vaccinIds:string[]
 }

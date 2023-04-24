@@ -11,8 +11,10 @@ export class PilgrimController {
   constructor(private pilgrim: PilgrimService) {}
 
   @Post('add')
-  addPilgrim(@Body() pilgrim: PilgromReqDto) {
-    return this.pilgrim.addPilgrim(pilgrim);
+  async addPilgrim(@Body() pilgrim: PilgromReqDto,@GetUser() user:User) {
+    const pilgrimData = await this.pilgrim.addPilgrim(pilgrim,user);
+
+    return  pilgrimData
   }
   @Get('allPilgrims')
   getAllPiligrims(

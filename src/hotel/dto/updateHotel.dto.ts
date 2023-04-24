@@ -16,4 +16,8 @@ export class UpdateHotelDto {
     @Min(1)
     @Max(5)
     stars?: number;
+
+    @IsOptional()
+    @Min(1)
+    capacity:number
   }

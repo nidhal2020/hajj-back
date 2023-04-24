@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Body, Get, Query, Delete, Param } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Get, Query, Delete, Param, HttpException, HttpStatus } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { query } from 'express';
 import { GetUser } from 'src/auth/decorator';
@@ -12,21 +12,30 @@ export class GroupController {
   constructor(private groupService: GroupService) {}
 
   @Post('creategroup')
-  async createGroup(@Body() dto: CreateGroupDto, @GetUser() user: User) {
+  async createGroup(@Body() dto: CreateGroupDto, @GetUser() user: any) {
 
-    return await this.groupService.createGroup(dto, user);
+    try {
+      return await this.groupService.createGroup(dto, user);
+    } catch (error) {
+      throw new HttpException(error,HttpStatus.BAD_REQUEST)
+      
+    }
   }
   @Get('allGroups')
-  async getAllGroupsByCountry(@Query() query: any,@GetUser() user: User){
+  async getAllGroupsByCountry(@Query() query: any,@GetUser() user: any){
   const { page , pageSize}  = query
     
     return await this.groupService.getAllGroups(page,pageSize)
   }
 
   @Get('groupsByCountry')
-  async getGroupsByCountry(@Query() query:any,@GetUser() user:User) {
-    const { page , pageSize}  = query
-    return await this.groupService.getGroupsByCountry(user,page,pageSize)
+  async getGroupsByCountry(@GetUser() user:any) {
+    try {
+      return await this.groupService.getGroupsByCountry(user)
+      
+    } catch (error) {
+      throw new HttpException(error,HttpStatus.BAD_REQUEST)
+    }
   }
 
   @Delete('deleteGroup/:id')

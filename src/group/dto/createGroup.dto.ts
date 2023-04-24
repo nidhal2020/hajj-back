@@ -14,11 +14,6 @@ export class CreateGroupDto {
     @MaxLength(200)
     description?:string
 
-    @IsString()
-    userId:String
-
-    @IsString()
-    chefId:string
 
     @IsString()
     hotelId:string
