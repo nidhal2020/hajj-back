@@ -1,5 +1,6 @@
 export class PilgrimResponseDto {
     pilgrimss: {
+      id:string
       numPassport: string;
       name: string;
       lastName: string;
@@ -10,7 +11,9 @@ export class PilgrimResponseDto {
       groupName: string;
       countryName: string;
       countryId: string;
+      status:any
     }[];
     totalPages: number;
+    totale:number
 
   }

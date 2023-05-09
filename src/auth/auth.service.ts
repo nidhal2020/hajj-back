@@ -83,6 +83,32 @@ export class AuthService {
     }
   }
 
+  async loginAgent(dto: any) {
+    //find the user by email
+    const agent = await this.prisma.agent.findUnique({
+      where: { matricule: dto.matricule },
+    });
+    //if user dose not exist throw exceptio
+    if (!agent) {
+      throw new ForbiddenException('Credentials incorrect!');
+    }
+    if (agent.status == false) {
+      throw new ForbiddenException('Contact KSA to activate your account');
+    }
+    if(agent.isDeleted == true){
+      throw new ForbiddenException('Your account is deleted');
+    }
+    //compare password
+    const pwMatches = await argon.verify(agent.password, dto.password);
+    //if password incorrect throw exception
+    if (!pwMatches) {
+      throw new ForbiddenException('Credentials incorrect!');
+    }
+    //send back the token
+    return this.signToken(agent.id, agent.email);
+  }
+
+
   async signToken(
     UserId: string,
     email: string,

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AgentService } from './agent.service';
 import { JwtGuard } from 'src/auth/guard';
 import { CreateAgentDto, UpdateAgentDto } from './dto';
@@ -29,8 +29,10 @@ export class AgentController {
     return await this.agentService.findOneByMatricule(matricule)
   }
 
-  @Put('update/:id')
-  async updateAgent(@Param('id' ) id:string, dto:UpdateAgentDto):Promise<Agent>{
+  @Patch('update/:id')
+  async updateAgent(@Param('id' ) id:string,@Body() dto:UpdateAgentDto):Promise<Agent>{
+    console.log('controller dto',dto);
+    
     return await this.agentService.update(id,dto)
   }
 

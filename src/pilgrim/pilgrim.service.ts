@@ -2,19 +2,37 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { Group } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PilgrimResponseDto, PilgromReqDto } from './dto';
+import { PilgrimResponseDto, PilgromReqDto, PiligrilQrCode } from './dto';
+import { async } from 'rxjs';
 
 @Injectable()
 export class PilgrimService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {
+  // this.test().then(res=>{
+  //   console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',res);
+    
+  // })
+  }
 
-  async addPilgrim(dto: PilgromReqDto,user:any): Promise<any> {
+
+  // async test():Promise<any>{
+  //   const pilgrim = await this.prisma.pilgrim.findMany({
+  //     select:{
+  //       status:true
+  //     }
+  //   })
+  //   return pilgrim
+  // }
+
+  async addPilgrim(dto: PilgromReqDto,user:any): Promise<PiligrilQrCode> {
     try {
       const group: Group = await this.prisma.group.findUnique({
         where: {
           id: dto.groupId,
         },
       });
+    
+      
       if (!group) {
         throw new Error(`Group with id ${dto.groupId} not found`);
       }
@@ -23,7 +41,7 @@ export class PilgrimService {
         data: {
           numPassport: dto.numPassport,
           lastName: dto.lastName,
-          name: dto.name,
+          name: dto.firstName,
           dateOfBirth: dto.dateOfBirth,
           gender: dto.gender,
           tel: dto.tel,
@@ -34,6 +52,9 @@ export class PilgrimService {
           },
         },
       });
+
+      
+      
       const promises = dto.diseaseIds.map(async (diseaseId) => {
         const disease = await this.prisma.disease.findFirst({
           where: {
@@ -86,13 +107,24 @@ export class PilgrimService {
           },
         });
       });
-      const pilgrimHasDiseases = await Promise.all(promises);
-      const pilgrimHasVaccins = await Promise.all(promises_vaccin);
+      // const pilgrimHasDiseases = 
+      await Promise.all(promises);
+      // const pilgrimHasVaccins = 
+      await Promise.all(promises_vaccin);
       const userData= await this.prisma.user.findUnique({
         where:{
-          id:user.user.id
+          id:user.id
         }
       })
+      await this.prisma.emergencyContact.create({
+        data: {
+          firstName: dto.firstNameEmergencyContact,
+          lastName: dto.lastNameEmergencyContact,
+          phone: dto.phoneEmergencyContact,
+          email: dto.emailEmergencyContact,
+          pilgrims: { connect: { id: pilgrim.id } },
+        },
+      });
 
       await this.prisma.user.update({
         where:{
@@ -101,8 +133,65 @@ export class PilgrimService {
           currentNumberOfArrivingPilgrims:userData.currentNumberOfArrivingPilgrims+1
         }
       })
+      const qrCOdeData = await this.prisma.pilgrim.findUnique({
+        where:{
+          id:pilgrim.id
+        },include:{
+          diseases:true,
+          vaccins:true,
+          emergencyContact:true
+        }
+      })
+      console.log('qrCOdeData',qrCOdeData.vaccins);
+      
+      const  emergencyContact = await this.prisma.emergencyContact.findUnique({
+        where:{
+          id:qrCOdeData.emergencyContact.id
+        },select:{
+          firstName:true,
+          lastName:true,
+          phone:true,
+        }
 
-      return pilgrim;
+      })
+      const diseasesName = qrCOdeData.diseases.map(async (disease:any)=>{
+          return await this.prisma.disease.findUnique({
+            where:{
+              id:disease.diseaseId
+            },select:{
+              diseaseName:true
+            }
+
+          })
+      })
+      const vaccinsName = qrCOdeData.vaccins.map(async (vaccin:any)=>{
+         return await this.prisma.vaccin.findUnique({
+          where:{
+            id:vaccin.vaccinId
+          },select:{
+            vaccinName:true
+          }
+        })
+      })
+      const diseasePormis =  await Promise.all(diseasesName)
+      const vaccinPromis= await Promise.all(vaccinsName)
+      const qrCode = {
+        id:qrCOdeData.id,
+        numPassport:qrCOdeData.numPassport,
+        name:qrCOdeData.name,
+        lastName:qrCOdeData.lastName,
+        dateOfBirth:qrCOdeData.dateOfBirth,
+        status:qrCOdeData.status,
+        nameEmercency:emergencyContact.firstName,
+        lastNameEmercency:emergencyContact.lastName,
+        phoneEmercency:emergencyContact.phone,
+        diseases: diseasePormis,
+        vaccins: vaccinPromis,
+      }
+      console.log(qrCode);
+      
+      return qrCode
+      
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -111,16 +200,39 @@ export class PilgrimService {
       }
       throw error;
     }
+    
+
+  }
+
+  async deletePilgrim(pilgrimId:string):Promise<any>{
+    console.log('pilgrimmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm');
+  
+    try {
+      
+      const pilgrim = await this.prisma.pilgrim.update({ where: { id:pilgrimId },data:{isDeleted:true} });
+      if (!pilgrim) {
+        throw new NotFoundException(`Could not find pilgrim with id ${pilgrimId}`);
+      }
+    } catch (error) {
+      throw new Error(`Could not delete pilgrim: ${error.message}`);
+    }
   }
 
   async getAllPilgrims(
     pageNumber: string,
     takeNumber: string,
+    country:string
   ): Promise<PilgrimResponseDto> {
     const pageSize = parseInt(takeNumber);
-    const page = parseInt(pageNumber);
+    const page = parseInt(pageNumber) - 1;
     const skip = page * pageSize;
-    const totalCount = await this.prisma.pilgrim.count();
+    const totalCount = await this.prisma.pilgrim.count({where:{
+      group:{
+        user:{
+          name:country
+        }
+      }
+    }});
     const totalPages = Math.ceil(totalCount / pageSize);
     const pilgrims = await this.prisma.pilgrim.findMany({
       skip: skip,
@@ -132,8 +244,16 @@ export class PilgrimService {
           },
         },
       },
+      where:{
+        group:{
+          user:{
+            name:country
+          }
+        },isDeleted:false
+      }
     });
     const pilgrim = pilgrims.map((pilgrim) => ({
+      id:pilgrim.id,
       numPassport: pilgrim.numPassport,
       name: pilgrim.name,
       lastName: pilgrim.lastName,
@@ -144,10 +264,12 @@ export class PilgrimService {
       groupName: pilgrim.group.name,
       countryName: pilgrim.group.user.name,
       countryId: pilgrim.group.user.id,
+      status : pilgrim.status
     }));
     return {
       pilgrimss: pilgrim,
       totalPages: totalPages,
+      totale: totalCount
     };
   }
   async getPilgrimByCountry(
@@ -156,7 +278,7 @@ export class PilgrimService {
     takeNumber: string,
   ): Promise<PilgrimResponseDto> {
     const pageSize = parseInt(takeNumber);
-    const page = parseInt(pageNumber);
+    const page = parseInt(pageNumber) - 1;
     const skip = page * pageSize;
     const totalCount = await this.prisma.pilgrim.count({
       where: {
@@ -184,10 +306,11 @@ export class PilgrimService {
           user: {
             id: userId,
           },
-        },
+        },isDeleted:false
       },
     });
     const pilgrim = pilgrims.map((pilgrim) => ({
+      id:pilgrim.id,
       numPassport: pilgrim.numPassport,
       name: pilgrim.name,
       lastName: pilgrim.lastName,
@@ -198,10 +321,27 @@ export class PilgrimService {
       groupName: pilgrim.group.name,
       countryName: pilgrim.group.user.name,
       countryId: pilgrim.group.user.id,
+      status:pilgrim.status
     }));
+    console.log(pilgrim[0]);
+    
     return {
       pilgrimss: pilgrim,
       totalPages: totalPages,
+      totale: totalCount
+      
     };
+  }
+
+  async updatePilgrimStatus(pilgrimId:string,status:any):Promise<any>{
+    try {
+      const pilgrim = await this.prisma.pilgrim.update({where:{id:pilgrimId},data:{status:status}})
+      if (!pilgrim) {
+        throw new NotFoundException(`Could not find pilgrim with id ${pilgrimId}`);
+      }
+      return pilgrim
+    } catch (error) {
+      throw new Error(`Could not update pilgrim: ${error.message}`);
+    }
   }
 }

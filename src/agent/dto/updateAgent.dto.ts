@@ -21,11 +21,11 @@ export class UpdateAgentDto {
     @IsString()
     departement?: string;
   
-    @IsOptional()
-    @IsString()
-    password?: string;
+    // @IsOptional()
+    // @IsString()
+    // password?: string;
   
     @IsNotEmpty()
     @IsBoolean()
-    status: boolean;
+    status?: boolean;
   }

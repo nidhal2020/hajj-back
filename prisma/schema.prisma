@@ -38,6 +38,7 @@ model Pilgrim {
   dateOfBirth        String
   tel                String
   isChef             Boolean                @default(false)
+  status             Status                 @default(NORMAL)
   groupId            String?
   group              Group?                 @relation(fields: [groupId], references: [id])
   chef               Chef[]
@@ -163,4 +164,11 @@ model Agent {
 enum Role {
   USER
   ADMIN
+}
+
+enum Status {
+  NORMAL
+  SICK
+  LOST
+  DEAD
 }

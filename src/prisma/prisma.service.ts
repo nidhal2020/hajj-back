@@ -55,7 +55,7 @@ export class PrismaService extends PrismaClient {
                 diseaseName:e
             }
         })
-        console.log(created);
+        
         
     }) 
   }
@@ -91,7 +91,6 @@ export class PrismaService extends PrismaClient {
           vaccinName:v
         }
       })
-      console.log(creted);
       
     })
   }

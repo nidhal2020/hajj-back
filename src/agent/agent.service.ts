@@ -47,11 +47,15 @@ export class AgentService {
       const agents = await this.prisma.agent.findMany({
         skip: skip,
         take: pageSize,
+        where:{
+          isDeleted:false
+        }
       });
       return {
         agents: agents,
         totalPages: totalPages,
         page: page,
+        totalAgent:totalCount
       };
     } catch (error) {
       return { message: error };
@@ -72,18 +76,30 @@ export class AgentService {
     });
   }
   async update(id: string, agentDto:UpdateAgentDto): Promise<Agent> {
-    return this.prisma.agent.update({
+    console.log(agentDto);
+    
+    return await this.prisma.agent.update({
       where: {
         id,
       },
-      data: agentDto,
+      data: {
+       
+        lastName : agentDto.lastName,
+        phone:agentDto.phone, 
+        firstName : agentDto.firstName,
+        email:agentDto.email,
+        departement:agentDto.departement,
+        status:agentDto.status
+      },
     });
   }
   async remove(id: string): Promise<Agent> {
-    return this.prisma.agent.delete({
+    return await this.prisma.agent.update({
       where: {
         id,
-      },
+      },data:{
+        isDeleted :true
+      }
     });
   }
   

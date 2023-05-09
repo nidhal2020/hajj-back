@@ -1,5 +1,5 @@
 
-import { IsDate, IsNotEmpty, IsString, Matches, MaxDate } from "class-validator"
+import { IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MaxDate } from "class-validator"
 
 export class PilgromReqDto{
 
@@ -7,9 +7,6 @@ export class PilgromReqDto{
     @IsString()
     numPassport:string
     
-    @IsNotEmpty()
-    @IsString()
-    name:string
 
     @IsNotEmpty()
     @IsString()
@@ -17,13 +14,17 @@ export class PilgromReqDto{
 
     @IsNotEmpty()
     @IsString()
+    firstName:string
+
+    @IsNotEmpty()
+    @IsString()
     gender:string
 
     @IsNotEmpty()
     @IsString()
-    @Matches(/^(0?[1-9]|1[0-2])\/(0?[1-9]|[1-2][0-9]|3[0-1])\/\d{4}$/, {
-        message: 'Invalid date format, expected MM/DD/YYYY',
-      })
+    // @Matches(/^(0?[1-9]|1[0-2])\/(0?[1-9]|[1-2][0-9]|3[0-1])\/\d{4}$/, {
+    //     message: 'Invalid date format, expected MM/DD/YYYY',
+    //   })
     dateOfBirth:string
     
     @IsNotEmpty()
@@ -36,4 +37,19 @@ export class PilgromReqDto{
 
     diseaseIds:string[]
     vaccinIds:string[]
+
+    @IsNotEmpty()
+    @IsString()
+    firstNameEmergencyContact:string
+    @IsNotEmpty()
+    @IsString()
+    lastNameEmergencyContact:string
+    @IsNotEmpty()
+    @IsString()
+    phoneEmergencyContact:string
+    @IsNotEmpty()
+    @IsString()
+    @IsEmail()
+    @IsOptional()
+    emailEmergencyContact:string
 }

@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { log } from 'console';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -44,6 +45,8 @@ export class PilgrimHasDiseasesService {
       });
       return pilgrimHasDisease;
     });
+
+    
     const pilgrimHasDiseases = await Promise.all(promises);
 
     return pilgrimHasDiseases;

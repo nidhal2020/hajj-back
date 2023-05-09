@@ -23,6 +23,10 @@ export class AuthController {
     return this.service.login(loginDto);
   }
 
+  @Post('loginagent')
+  async loginAgent(@Body() loginDto: any) {
+    return this.service.loginAgent(loginDto);
+  }
   @Post('registre')
   async CreateCountry(@Body() createCountry: CreateReqDto) {
     return this.service.registreCountry(createCountry);
