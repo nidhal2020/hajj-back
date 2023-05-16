@@ -346,7 +346,7 @@ export class PilgrimService {
   }
   async scannHistory(pilgrimId:string,agentId:string,status:any):Promise<any>{
     try{
-      await this.prisma.scanne.create({data:{
+    return  await this.prisma.scanne.create({data:{
         pilgrimId:pilgrimId,
         agentId:agentId,
         action:status

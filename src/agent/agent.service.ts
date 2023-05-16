@@ -83,6 +83,9 @@ export class AgentService {
           agent: true,
           pilgrim: true,
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
       });
       return histoy;
     } catch (error) {

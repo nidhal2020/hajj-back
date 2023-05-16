@@ -20,6 +20,8 @@ import { PilgrimHasVaccinsModule } from './pilgrim_has_vaccins/pilgrim_has_vacci
 import { EmergencyContactModule } from './emergency-contact/emergency-contact.module';
 import { HotelModule } from './hotel/hotel.module';
 import { AgentModule } from './agent/agent.module';
+import { SocketGateway } from './socketIO/socket.gateway';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { AgentModule } from './agent/agent.module';
     HotelModule,
     AgentModule,
   ],
+  controllers: [AppController],
+  providers: [SocketGateway],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
