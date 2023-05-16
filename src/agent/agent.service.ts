@@ -75,6 +75,22 @@ export class AgentService {
       },
     });
   }
+
+  async getHistory(): Promise<any> {
+    try {
+      const histoy = await this.prisma.scanne.findMany({
+        include: {
+          agent: true,
+          pilgrim: true,
+        },
+      });
+      return histoy;
+    } catch (error) {
+      return { message: error };
+    }
+  }
+
+
   async update(id: string, agentDto:UpdateAgentDto): Promise<Agent> {
     console.log(agentDto);
     

@@ -344,4 +344,17 @@ export class PilgrimService {
       throw new Error(`Could not update pilgrim: ${error.message}`);
     }
   }
+  async scannHistory(pilgrimId:string,agentId:string,status:any):Promise<any>{
+    try{
+      await this.prisma.scanne.create({data:{
+        pilgrimId:pilgrimId,
+        agentId:agentId,
+        action:status
+      }})
+    }catch(error){
+      throw new Error(`Could not insert scann histoy: ${error.message}`);
+    }
+  }
+
+
 }

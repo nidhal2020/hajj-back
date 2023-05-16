@@ -4,6 +4,7 @@ import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { PilgromReqDto } from './dto';
 import { PilgrimService } from './pilgrim.service';
+import { agent } from 'supertest';
 
 @UseGuards(JwtGuard)
 @Controller('pilgrim')
@@ -55,7 +56,8 @@ export class PilgrimController {
   }
 
   @Put('updatestatus/:id')
-  async updateStatus(@Param('id') id:string,@Body() status:any):Promise<any>{
+  async updateStatus(@Param('id') id:string,@Body() status:any,@GetUser() agent:any):Promise<any>{
+    await this.pilgrim.scannHistory(id,agent.id,status)
     return await this.pilgrim.updatePilgrimStatus(id,status)
   }
 }

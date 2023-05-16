@@ -13,6 +13,10 @@ export class AgentController {
   async createAgent(@Body() dto:CreateAgentDto){
     return await this.agentService.createAgent(dto)
   }
+  @Get('gethistory')
+  async getHistory(){
+    return await this.agentService.getHistory()
+  }
 
   @Get('getAllAgents')
   async getAllAgents(@Query() query: any):Promise<any>{

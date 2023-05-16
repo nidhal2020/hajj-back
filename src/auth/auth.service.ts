@@ -84,6 +84,8 @@ export class AuthService {
   }
 
   async loginAgent(dto: any) {
+
+    
     //find the user by email
     const agent = await this.prisma.agent.findUnique({
       where: { matricule: dto.matricule },
@@ -105,7 +107,7 @@ export class AuthService {
       throw new ForbiddenException('Credentials incorrect!');
     }
     //send back the token
-    return this.signToken(agent.id, agent.email);
+    return this.signToken(agent.id, agent.matricule);
   }
 
 

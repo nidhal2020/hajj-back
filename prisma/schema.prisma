@@ -46,6 +46,7 @@ model Pilgrim {
   vaccins            Pilgrim_Has_Vaccins[]
   emergencyContact   EmergencyContact?      @relation(fields: [emergencyContactId], references: [id])
   emergencyContactId String?
+  scanned            Scanne[]
 }
 
 model EmergencyContact {
@@ -159,6 +160,16 @@ model Agent {
   email       String?
   departement String
   password    String
+  scanned     Scanne[]
+}
+model Scanne {
+  id        String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  agentId   String
+  agent     Agent     @relation( fields: [agentId], references: [id])
+  pilgrimId String
+  pilgrim   Pilgrim   @relation( fields: [pilgrimId], references: [id])
+  action    Status
 }
 
 enum Role {
