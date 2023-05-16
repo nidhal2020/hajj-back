@@ -57,7 +57,19 @@ export class PilgrimController {
 
   @Put('updatestatus/:id')
   async updateStatus(@Param('id') id:string,@Body() status:any,@GetUser() agent:any):Promise<any>{
-    await this.pilgrim.scannHistory(id,agent.id,status)
-    return await this.pilgrim.updatePilgrimStatus(id,status)
-  }
-}
+   try {
+    console.log('id',id);
+    console.log('status',status.status);
+    console.log('agent',agent);
+    
+    
+     await this.pilgrim.scannHistory(id,agent.id,status.status)
+     return { data:await this.pilgrim.updatePilgrimStatus(id,status.status),
+       message:'updated successfully',
+     success:true
+   }
+   } catch (error) {
+  
+      throw new Error(`Could not update pilgrim: ${error.message}`);
+   }
+}}
