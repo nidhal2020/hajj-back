@@ -355,6 +355,121 @@ export class PilgrimService {
       throw new Error(`Could not insert scann histoy: ${error.message}`);
     }
   }
+  async getStatistiqueAdmin():Promise<any>{
+    const pilgrims = await this.prisma.pilgrim.count()
+    const pilgrimsLost = await this.prisma.pilgrim.count({where:{status:'LOST'}})
+    const pilgrimssDeath = await this.prisma.pilgrim.count({where:{status:'DEAD'}})
+    const pilgrimssSick = await this.prisma.pilgrim.count({where:{status:'SICK'}})
+    
+    return {
+      pilgrims:pilgrims,
+      pilgrimsLost:pilgrimsLost,
+      pilgrimssDeath:pilgrimssDeath,
+      pilgrimssSiock:pilgrimssSick
+  }
+}
+async getStatistiqueCountry(userId:string):Promise<any>{
+  const pilgrims = await this.prisma.pilgrim.count({where:{
+    group:{
+      user:{
+        id:userId
+      }
+    }
+  }});
+  const pilgrimsLost = await this.prisma.pilgrim.count({where:{
+    group:{
+      user:{
+        id:userId
+      }
+    },status:'LOST'
+  }});
+  const pilgrimssDeath = await this.prisma.pilgrim.count({where:{
+    group:{
+      user:{
+        id:userId
+      }
+    },status:'DEAD'
+  }});
+  const pilgrimssSick = await this.prisma.pilgrim.count({where:{
+    group:{
+      user:{
+        id:userId
+      }
+    },status:'SICK'
+  }});
+  return {
+    pilgrims:pilgrims,
+    pilgrimsLost:pilgrimsLost,
+    pilgrimssDeath:pilgrimssDeath,
+    pilgrimssSick:pilgrimssSick
+  }
+
+}
+
+async getAgeRangeStatistics(userId:string):Promise<any>{
+  const ageRanges = {
+    '0-20': 0,
+    '21-30': 0,
+    '31-40': 0,
+    '41-50': 0,
+    '51+': 0,
+  };
+  const user = await this.prisma.user.findUnique({
+    where:{
+      id:userId
+    }
+  })
+  if(user.role==='ADMIN'){
+    const pilgrims = await this.prisma.pilgrim.findMany();
+    pilgrims.forEach((pilgrim) => {
+      const age = this.calculateAge(pilgrim.dateOfBirth, new Date());
+      if (age <= 20) {
+        ageRanges['0-20']++;
+      } else if (age <= 30) {
+        ageRanges['21-30']++;
+      } else if (age <= 40) {
+        ageRanges['31-40']++;
+      } else if (age <= 50) {
+        ageRanges['41-50']++;
+      } else {
+        ageRanges['51+']++;
+      }
+    });
+  }else if (user.role === 'USER') {
+    const pilgrims = await this.prisma.pilgrim.findMany({
+      where:{
+        group:{
+          user:{
+            id:userId
+          }
+      }
+    }
+    });
+    pilgrims.forEach((pilgrim) => {
+      const age = this.calculateAge(pilgrim.dateOfBirth, new Date());
+      if (age <= 20) {
+        ageRanges['0-20']++;
+      } else if (age <= 30) {
+        ageRanges['21-30']++;
+      } else if (age <= 40) {
+        ageRanges['31-40']++;
+      } else if (age <= 50) {
+        ageRanges['41-50']++;
+      } else {
+        ageRanges['51+']++;
+      }
+    });
+  }
+  
+  return ageRanges;
+}
+
+calculateAge(dateOfBirth: string, currentDate: Date): number {
+  const birthYear = parseInt(dateOfBirth.substring(0, 4)) ;
+  const currentYear = currentDate.getFullYear();
+  const age = currentYear - birthYear;
+  return age;
+}
 
 
 }

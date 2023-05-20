@@ -119,4 +119,16 @@ export class PilgrimController {
       throw new Error(`Could not update pilgrim: ${error.message}`);
     }
   }
+  @Get('statistics')
+  async getStatistics() {
+    return await this.pilgrim.getStatistiqueAdmin();
+  }
+  @Get('statisticsByCountry')
+  async getStatisticsByCountry(@GetUser() user: any) {
+    return await this.pilgrim.getStatistiqueCountry(user.id);
+  }
+  @Get('statisticage')
+  async getStatisticAge(@GetUser() user: any) {
+    return await this.pilgrim.getAgeRangeStatistics(user.id);
+  }
 }
